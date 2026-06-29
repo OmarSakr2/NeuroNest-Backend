@@ -4,11 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace AustimAPI.Models
 {
-    // ✅ جدول جديد لحفظ كود الـ Reset بشكل مؤقت
-    // المنطق:
-    //   1. المستخدم يطلب Reset → نحفظ كود عشوائي هنا مع وقت انتهاء
-    //   2. المستخدم يبعت الكود → نتحقق منه هنا
-    //   3. بعد التحقق نغير الباسورد في جدول User ونحذف الكود
+
     public class PasswordReset
     {
         [Key]
