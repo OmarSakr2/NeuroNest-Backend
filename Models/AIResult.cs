@@ -9,10 +9,10 @@ namespace AustimAPI.Models
         public int ResultID { get; set; }
         public int ScreeningID { get; set; }
 
-        // ✅ مطلب 7 — المسار الفعلي على السيرفر
+        //  مطلب 7 — المسار الفعلي على السيرفر
         public string? VideoPath { get; set; }
 
-        // ✅ مطلب 7 — الـ URL اللي Flutter بتستخدمه
+        // ـ URL اللي Flutter بتستخدمه
         public string? VideoUrl { get; set; }
 
         public float? RiskScorePercentage { get; set; }
