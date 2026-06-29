@@ -21,7 +21,6 @@ namespace AustimAPI.Controllers
             _aiService = aiService;
         }
 
-        // ✅ GET /api/Screening — كل الجلسات
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -44,7 +43,6 @@ namespace AustimAPI.Controllers
                 .ToListAsync());
         }
 
-        // ✅ POST /api/Screening — إنشاء جلسة جديدة
         [HttpPost]
         public async Task<IActionResult> Create(CreateScreeningDTO dto)
         {
@@ -69,7 +67,6 @@ namespace AustimAPI.Controllers
             _context.Screening.Add(screening);
             await _context.SaveChangesAsync();
 
-            // ✅ nextStep حسب النوع
             var nextStep = dto.ScreeningType == "Video"
                 ? "POST /api/video/upload"
                 : "POST /api/Screening/submit-answers";
@@ -84,7 +81,6 @@ namespace AustimAPI.Controllers
             });
         }
 
-        // ✅ POST /api/Screening/submit-answers
         [HttpPost("submit-answers")]
         public async Task<IActionResult> SubmitAnswers([FromBody] SubmitAnswersDTO dto)
         {
@@ -114,7 +110,6 @@ namespace AustimAPI.Controllers
             int ageMonths = (int)((DateTime.UtcNow - child.DateOfBirth).TotalDays / 30.44);
             int sex = child.Gender?.ToLower() == "male" ? 1 : 0;
 
-            // حذف الإجابات القديمة
             var oldAnswers = await _context.QuestionnaireAnswer
                 .Where(a => a.ScreeningID == dto.ScreeningId)
                 .ToListAsync();
@@ -181,7 +176,6 @@ namespace AustimAPI.Controllers
             }
             else
             {
-                // Fallback لو الـ AI مش شغال
                 int count = dto.Answers.Count(a => a.HasValue && a.Value >= 0.5f);
                 riskLevel = count >= 8 ? "High" : count >= 3 ? "Moderate" : "Low";
                 riskScorePercentage = count;
@@ -210,7 +204,6 @@ namespace AustimAPI.Controllers
             });
         }
 
-        // ✅ GET /api/Screening/child/{childId}/history
         [HttpGet("child/{childId}/history")]
         public async Task<IActionResult> GetChildHistory(int childId)
         {
