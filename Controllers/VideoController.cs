@@ -46,7 +46,6 @@ namespace AustimAPI.Controllers
                         message = "نوع الملف غير مسموح. الأنواع المسموحة: mp4, mov, avi, mkv"
                     });
 
-                // ✅ حفظ الفيديو
                 var uploadsFolder = Path.Combine(_env.WebRootPath ?? "wwwroot", "videos");
                 if (!Directory.Exists(uploadsFolder))
                     Directory.CreateDirectory(uploadsFolder);
@@ -59,7 +58,6 @@ namespace AustimAPI.Controllers
 
                 var videoUrl = $"{Request.Scheme}://{Request.Host}/videos/{fileName}";
 
-                // ✅ إنشاء Screening للفيديو
                 var screening = new Screening
                 {
                     ChildID = dto.ChildID,
@@ -73,10 +71,8 @@ namespace AustimAPI.Controllers
                 _context.Screening.Add(screening);
                 await _context.SaveChangesAsync();
 
-                // ✅ بعت الـ filePath الكامل للـ AI
                 var aiResult = await _aiService.AnalyzeVideo(filePath);
 
-                // ✅ لو الـ AI فشل — احذف الفيديو وحدّث الـ Status
                 if (aiResult == null)
                 {
                     screening.Status = "Failed";
@@ -88,15 +84,12 @@ namespace AustimAPI.Controllers
                     return BadRequest(new { message = "فشل تحليل الفيديو" });
                 }
 
-                // ✅ تأمين القيمة null قبل أي عملية حسابية (RiskScorePercentage بقت float?)
                 var scorePercentage = aiResult.RiskScorePercentage ?? 0f;
 
-                // ✅ تحديد RiskLevel
                 var riskLevel = scorePercentage >= 70 ? "High"
                               : scorePercentage >= 40 ? "Moderate"
                               : "Low";
 
-                // ✅ رسالة واضحة بـ switch
                 var message = riskLevel switch
                 {
                     "High" => "ننصح بزيارة متخصص فوراً",
@@ -104,25 +97,23 @@ namespace AustimAPI.Controllers
                     _ => "النتيجة في المدى الطبيعي"
                 };
 
-                // ✅ تخزين النتيجة — fileName مش filePath
                 var result = new AIResult
                 {
                     ScreeningID = screening.ScreeningID,
-                    VideoPath = fileName,   // ✅ اسم الملف بس
-                    VideoUrl = videoUrl,    // ✅ الـ URL الكامل
-                    RiskScorePercentage = aiResult.RiskScorePercentage,   // يبقى nullable في AIResult، تمام
+                    VideoPath = fileName, 
+                    VideoUrl = videoUrl,   
+                    RiskScorePercentage = aiResult.RiskScorePercentage,  
                     OverallConfidence = aiResult.OverallConfidence,
                     AI_JSON_Data = aiResult.RawJson
                 };
 
                 screening.Status = "Completed";
                 screening.RiskLevel = riskLevel;
-                screening.TotalScore = scorePercentage;   // ✅ float عادي، مش nullable في Screening
+                screening.TotalScore = scorePercentage;   
 
                 _context.AIResult.Add(result);
                 await _context.SaveChangesAsync();
 
-                // ✅ الـ JSON الكامل لـ Flutter
                 var aiResultFull = System.Text.Json.JsonSerializer
                     .Deserialize<object>(aiResult.RawJson);
 
