@@ -14,7 +14,6 @@ namespace AustimAPI.Controllers
         private readonly apiDBContext _context;
         public ChildController(apiDBContext context) { _context = context; }
 
-        // GET /api/child — كل أطفال المستخدم
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -34,7 +33,6 @@ namespace AustimAPI.Controllers
                 .ToListAsync());
         }
 
-        // ✅ مطلب 9 — GET /api/child/{id}/name — جيب اسم الطفل بس
         [HttpGet("{id}/name")]
         public async Task<IActionResult> GetChildName(int id)
         {
@@ -50,7 +48,6 @@ namespace AustimAPI.Controllers
             return Ok(child);
         }
 
-        // POST /api/child — إضافة طفل
         [HttpPost]
         public async Task<IActionResult> AddChild([FromBody] AddChildDTO dto)
         {
@@ -78,7 +75,6 @@ namespace AustimAPI.Controllers
             });
         }
 
-        // PUT /api/child/{id} — تعديل بيانات طفل
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateChild(int id, [FromBody] UpdateChildDTO dto)
         {
@@ -107,7 +103,6 @@ namespace AustimAPI.Controllers
             });
         }
 
-        // DELETE /api/child/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteChild(int id)
         {
