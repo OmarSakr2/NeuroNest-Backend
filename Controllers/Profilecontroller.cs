@@ -18,12 +18,7 @@ namespace AustimAPI.Controllers
             _context = context;
         }
 
-        // ==========================================
-        // ✅ GET /api/profile
-        // جلب بيانات المستخدم + أطفاله + آخر نتائج
-        // ==========================================
-        // Flutter بتستدعيه لعرض صفحة البروفايل
-        [HttpGet]
+         [HttpGet]
         public async Task<IActionResult> GetProfile()
         {
             var userId = int.Parse(User.FindFirst("id")!.Value);
@@ -37,7 +32,6 @@ namespace AustimAPI.Controllers
                     u.Email,
                     u.CreatedAt,
 
-                    // جلب الأطفال مع آخر نتيجة لكل طفل
                     Children = u.Children.Select(c => new
                     {
                         c.ChildID,
@@ -45,7 +39,6 @@ namespace AustimAPI.Controllers
                         c.DateOfBirth,
                         c.Gender,
 
-                        // آخر Screening للطفل ده
                         LastScreening = c.Screenings
                             .OrderByDescending(s => s.ScreeningDate)
                             .Select(s => new
@@ -67,11 +60,7 @@ namespace AustimAPI.Controllers
             return Ok(user);
         }
 
-        // ==========================================
-        // ✅ PUT /api/profile
-        // تعديل اسم المستخدم
-        // ==========================================
-        // Flutter بتبعت: { "fullName": "اسم جديد" }
+      
         [HttpPut]
         public async Task<IActionResult> UpdateProfile(UpdateProfileDTO dto)
         {
@@ -81,7 +70,6 @@ namespace AustimAPI.Controllers
             if (user == null)
                 return NotFound("المستخدم مش موجود");
 
-            // التحقق إن الاسم مش فاضي
             if (string.IsNullOrWhiteSpace(dto.FullName))
                 return BadRequest("الاسم لازم يكون موجود");
 
@@ -95,11 +83,6 @@ namespace AustimAPI.Controllers
             });
         }
 
-        // ==========================================
-        // ✅ PUT /api/profile/change-password
-        // تغيير الباسورد وهو مسجل دخول
-        // ==========================================
-        // Flutter بتبعت: { "currentPassword": "...", "newPassword": "..." }
         [HttpPut("change-password")]
         public async Task<IActionResult> ChangePassword(ChangePasswordDTO dto)
         {
@@ -109,11 +92,9 @@ namespace AustimAPI.Controllers
             if (user == null)
                 return NotFound("المستخدم مش موجود");
 
-            // التحقق من الباسورد الحالي
             if (!BCrypt.Net.BCrypt.Verify(dto.CurrentPassword, user.PasswordHash))
                 return BadRequest("الباسورد الحالي غلط");
 
-            // التحقق إن الباسورد الجديد مختلف
             if (dto.CurrentPassword == dto.NewPassword)
                 return BadRequest("الباسورد الجديد لازم يكون مختلف عن الحالي");
 
