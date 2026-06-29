@@ -17,8 +17,7 @@ namespace AustimAPI.Controllers
             _context = context;
         }
 
-        // ✅ بيرجع إجابات المستخدم اللي اتحفظت
-        // (بتتحفظ من خلال POST /api/Screening/submit-answers)
+     
         [HttpGet]
         public async Task<IActionResult> Get()
         {
